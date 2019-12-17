@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CoreApp": {
+      "commandName": "Project",
+      "commandLineArgs": "-from-Ip 127.0.0.1 -from-port 3333 -to-ip 127.0.0.1 -to-port 80 -encryption none"
+    }
+  }
+}

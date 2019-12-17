@@ -1,1 +1,84 @@
-﻿
+﻿mono Projects/rTunel/rTunel/bin/Debug/netcoreapp3.0/rTunel.dll -from-ip 127.0.0.1 -from-port 3333 -to-ip 127.0.0.1 -to-port 3334
+mono Projects/rTunel/rTunel/bin/Debug/netcoreapp3.0/rTunel.dll -from-ip 127.0.0.1 -from-port 3334 -to-ip 8157078a901a.sn.mynetname.net -to-port 34567
+
+
+mono Projects/rTunel/rTunel/bin/Debug/netcoreapp3.0/rTunel.dll -from-Ip 127.0.0.1 -from-port 3001 -to-ip 127.0.0.1 -to-port 3002 -encryption-method XOR -encryption-key 123
+mono Projects/rTunel/rTunel/bin/Debug/netcoreapp3.0/rTunel.dll -from-Ip 127.0.0.1 -from-port 3002 -to-ip 8157078a901a.sn.mynetname.net -to-port 34567 -encryption-method XOR -encryption-key 123
+
+   using (TcpClient client = tcpListener.AcceptTcpClient())
+                        {
+                            if (client.Connected)
+                            {
+
+                                IPHostEntry toHostEntry = Dns.GetHostEntry(AppConfiguration.ToIp);
+                                IPEndPoint toEndPoint = new IPEndPoint(toHostEntry.AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork).First(), AppConfiguration.ToPort);
+
+                                using (TcpClient myRerouting = new TcpClient())
+                                {
+                                    myRerouting.Connect(toEndPoint);
+
+                                    var inStream = client.GetStream();
+                                    var outStream = myRerouting.GetStream();
+
+                                    byte[] buffer = new byte[1024];
+                                    byte[] inData;
+        
+                                    using (MemoryStream memoryStream = new MemoryStream())
+                                    {
+                                        int offset = 0;
+                                        do
+                                        {
+                                            offset += inStream.Read(buffer, 0, buffer.Length);
+                                            memoryStream.Write(buffer, 0, buffer.Length);
+
+                                        } while (inStream.DataAvailable);
+
+                                        inData = new byte[offset];
+                                        Array.Copy(memoryStream.ToArray(),inData,offset);
+
+                                        String msg = Encoding.Unicode.GetString(inData, 0, inData.Length);
+                                        Console.WriteLine($"-> {msg}");
+                                        Console.WriteLine($"-> {inData.Length} bytes");
+                                    }
+
+                                    if (myRerouting.Connected)
+                                    {
+                                        // Пишем
+                                        outStream.Write(inData, 0, inData.Length);
+
+                                        byte[] outData;
+                                        using (MemoryStream memoryStream = new MemoryStream())
+                                        {
+                                            int offset = 0;
+                                            do
+                                            {
+                                                offset += outStream.Read(buffer, 0, buffer.Length);
+                                                memoryStream.Write(buffer, 0, buffer.Length);
+
+                                            } while (outStream.DataAvailable);
+
+                                            outData = new byte[offset];
+                                            Array.Copy(memoryStream.ToArray(),outData,offset);
+                                            String msg = Encoding.Unicode.GetString(outData, 0, outData.Length);
+                                            Console.WriteLine($"<- {msg}");
+                                            Console.WriteLine($"<- {outData.Length} bytes");
+                                        }
+
+                                        if (client.Connected)
+                                        {
+                                            inStream.Write(outData, 0, outData.Length);
+                                        }
+
+
+                                    }
+                                    else
+                                    {
+                                        client.Close();
+                                    }
+
+
+                                }
+
+
+                            }
+                        }
