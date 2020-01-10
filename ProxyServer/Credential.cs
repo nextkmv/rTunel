@@ -20,6 +20,15 @@ namespace rTunel.ProxyServer
             this.privateKey = privateKey;
         }
 
-        
+        public override string ToString()
+        {
+            string isPrivateKey = "No";
+            if(privateKey != String.Empty)
+            {
+                isPrivateKey = "YES";
+            }
+
+            return $"Credential method {method}, use key {isPrivateKey}";
+        }
     }
 }

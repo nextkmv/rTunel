@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("WinowsService")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("rTunel - Winows service")]
+[assembly: AssemblyDescription("TCP tunel services")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("WinowsService")]
+[assembly: AssemblyCompany("Viktor Sergienko")]
+[assembly: AssemblyProduct("rTunel")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -26,5 +26,10 @@ namespace rTunel.ProxyServer
             this.protocol = protocol;
         }
 
+        public override string ToString()
+        {
+            return $"{fromIp}:{fromPort} -> {toIp}:{toPort}";
+        }
+
     }
 }

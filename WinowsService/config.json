@@ -1,0 +1,33 @@
+{
+  "name": "Default config",
+  "preferences": [
+    {
+      "name": "Default rule",
+      "credential": {
+        "method": "none",
+        "privateKey": ""
+      },
+      "endPoints": {
+        "fromIp": "127.0.0.1",
+        "fromPort": 8080,
+        "toIp": "127.0.0.1",
+        "toPort": 80,
+        "protocol": "tcp"
+      }
+    },
+    {
+      "name": "Default rule 2",
+      "credential": {
+        "method": "none",
+        "privateKey": ""
+      },
+      "endPoints": {
+        "fromIp": "127.0.0.1",
+        "fromPort": 8085,
+        "toIp": "127.0.0.1",
+        "toPort": 80,
+        "protocol": "tcp"
+      }
+    }
+  ]
+}

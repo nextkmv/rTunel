@@ -10,8 +10,13 @@ namespace rTunel.ProxyServer
 {
     public class Server : IProxy
     {
-        EndPoints endPoints;
-        Credential credential;
+        private static readonly NLog.Logger Log = NLog.LogManager.GetCurrentClassLogger();
+        private bool running = false;
+
+        public bool IsRunning { get { return running; } }
+
+        public EndPoints endPoints;
+        public Credential credential;
 
         public Server(EndPoints endPoints, Credential credential)
         {
@@ -19,14 +24,19 @@ namespace rTunel.ProxyServer
             this.credential = credential;
         }
 
+        public void Stop()
+        {
+            running = false;
+        }
+
         public async Task Start()
         {
             IPAddress localIpAddress = string.IsNullOrEmpty(endPoints.FromIp) ? IPAddress.IPv6Any : IPAddress.Parse(endPoints.FromIp);
             var server = new System.Net.Sockets.TcpListener(new IPEndPoint(localIpAddress, endPoints.FromPort));
             server.Start();
-            Console.WriteLine($"TCP proxy started {endPoints.FromIp}:{endPoints.FromPort}...");
-
-            while (true)
+            Log.Info($"TCP proxy started on {endPoints}. {credential.ToString()}");
+            running = true;
+            while (running)
             {
                 try
                 {
@@ -38,9 +48,7 @@ namespace rTunel.ProxyServer
                 }
                 catch (Exception ex)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(ex);
-                    Console.ResetColor();
+                    Log.Debug(ex, $"Start server on {endPoints} exception: {ex.ToString()}");
                 }
             }
         }
@@ -49,6 +57,7 @@ namespace rTunel.ProxyServer
 
     class TcpClient
     {
+        private static readonly NLog.Logger Log = NLog.LogManager.GetCurrentClassLogger();
         private System.Net.Sockets.TcpClient remoteClient;
         private IPEndPoint clientEndpoint;
         private IPEndPoint remoteServer;
@@ -61,7 +70,7 @@ namespace rTunel.ProxyServer
             this.credential = credential;
             client.NoDelay = true;
             this.clientEndpoint = (IPEndPoint)this.remoteClient.Client.RemoteEndPoint;
-            Console.WriteLine($"Established {this.clientEndpoint} => {this.remoteServer}");
+            Log.Debug($"Established {this.clientEndpoint} => {this.remoteServer}");
             Run();
         }
 
@@ -101,11 +110,11 @@ namespace rTunel.ProxyServer
                   }
                   catch (Exception e)
                   {
-                      Console.WriteLine(e.ToString());
+                      Log.Error(e, $"Run server exception: {e.ToString()}");
                   }
                   finally
                   {
-                      Console.WriteLine($"Closed {this.clientEndpoint} => {this.remoteServer}");
+                      Log.Debug($"Closed {this.clientEndpoint} => {this.remoteServer}");
                       this.remoteClient = null;
                   }
               });
